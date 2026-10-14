@@ -1,8 +1,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include "sim/sim.h"
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

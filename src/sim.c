@@ -38,4 +38,27 @@ sim_status_t sim_run(sim_t *sim) { return SIM_OK; }
 
 sim_status_t sim_run_until(sim_t *sim, sim_time_t until) { return SIM_OK; }
 
-const char *sim_status_string(sim_status_t status) { return "\0"; };
+const char *sim_status_string(sim_status_t status) {
+    switch (status) {
+    case SIM_OK:
+        return "Success";
+    case SIM_ERR_INVALID_ARGUMENT:
+        return "Invalid argument";
+    case SIM_ERR_OUT_OF_MEMORY:
+        return "Out of memory";
+    case SIM_ERR_NOT_FOUND:
+        return "Not found";
+    case SIM_ERR_TIME_IN_PAST:
+        return "Event time is in the past";
+    case SIM_ERR_TIME_OVERFLOW:
+        return "Simulation time overflow";
+    case SIM_ERR_ID_OVERFLOW:
+        return "Event ID overflow";
+    case SIM_ERR_CALLBACK:
+        return "Event callback failed";
+    case SIM_ERR_REENTRANT:
+        return "Reentrant operation";
+    default:
+        return "Unknown status";
+    }
+}

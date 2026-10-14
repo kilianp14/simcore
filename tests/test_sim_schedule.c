@@ -1,5 +1,6 @@
 #include "sim/sim.h"
 #include "test.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -362,7 +363,10 @@ static bool test_sim_cancel_synchronous_exactly_once(void) {
     return true;
 }
 
+/* Scheduling test suite. */
+
 static const test_case_t tests[] = {
+    /* Scheduling */
     TEST_CASE(
         "sim_schedule_at_orders_by_time_then_id", test_sim_schedule_at_orders_by_time_then_id
     ),
@@ -370,6 +374,8 @@ static const test_case_t tests[] = {
     TEST_CASE("sim_schedule_validate_arguments", test_sim_schedule_validate_arguments),
     TEST_CASE("sim_schedule_after_uses_current_time", test_sim_schedule_after_uses_current_time),
     TEST_CASE("sim_schedule_after_time_overflow", test_sim_schedule_after_time_overflow),
+
+    /* Cancelling */
     TEST_CASE("sim_cancel_remove_pending_event", test_sim_cancel_remove_pending_event),
     TEST_CASE("sim_cancel_null_arguments", test_sim_cancel_null_arguments),
     TEST_CASE(

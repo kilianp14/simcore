@@ -3,9 +3,10 @@
 #include <string.h>
 
 test_suite_t test_suite_lifecycle(void);
+test_suite_t test_suite_schedule(void);
 
 int main(int argc, char **argv) {
-    const test_suite_t suites[] = {test_suite_lifecycle()};
+    const test_suite_t suites[] = {test_suite_lifecycle(), test_suite_schedule()};
     const size_t suite_count = sizeof(suites) / sizeof(suites[0]);
     size_t run_count = 0;
     size_t passed_count = 0;

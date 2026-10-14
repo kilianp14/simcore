@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Shared callback helpers */
 
@@ -249,6 +250,35 @@ static bool test_sim_now_null_arguments(void) {
     return true;
 }
 
+/* Status messages */
+
+/* Verifies descriptions for all defined status codes and unknown values. */
+static bool test_sim_status_string(void) {
+    static const struct {
+        sim_status_t status;
+        const char *expected;
+    } cases[] = {
+        {SIM_OK, "Success"},
+        {SIM_ERR_INVALID_ARGUMENT, "Invalid argument"},
+        {SIM_ERR_OUT_OF_MEMORY, "Out of memory"},
+        {SIM_ERR_NOT_FOUND, "Not found"},
+        {SIM_ERR_TIME_IN_PAST, "Event time is in the past"},
+        {SIM_ERR_TIME_OVERFLOW, "Simulation time overflow"},
+        {SIM_ERR_ID_OVERFLOW, "Event ID overflow"},
+        {SIM_ERR_CALLBACK, "Event callback failed"},
+        {SIM_ERR_REENTRANT, "Reentrant operation"},
+    };
+
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+        CHECK(strcmp(sim_status_string(cases[i].status), cases[i].expected) == 0);
+    }
+
+    CHECK(strcmp(sim_status_string(-1), "Unknown status") == 0);
+    CHECK(strcmp(sim_status_string(999), "Unknown status") == 0);
+
+    return true;
+}
+
 /* Lifecycle test suite. */
 
 static const test_case_t tests[] = {
@@ -269,6 +299,9 @@ static const test_case_t tests[] = {
 
     /* Time queries */
     TEST_CASE("sim_now_null_arguments", test_sim_now_null_arguments),
+
+    /* Status messages */
+    TEST_CASE("sim_status_string", test_sim_status_string),
 };
 
 test_suite_t test_suite_lifecycle(void) {
