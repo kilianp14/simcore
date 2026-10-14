@@ -107,6 +107,8 @@ sim_status_t sim_destroy(sim_t *sim);
  * @param sim Simulator.
  * @param[out] out Receives the current time.
  * @return SIM_OK or SIM_ERR_INVALID_ARGUMENT.
+ *
+ * On failure, *out remains unchanged.
  */
 sim_status_t sim_now(const sim_t *sim, sim_time_t *out);
 
