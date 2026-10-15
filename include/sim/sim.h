@@ -71,14 +71,7 @@ typedef sim_status_t (*sim_callback_fn)(
  * cancelled, or when discarded during destruction.
  *
  * Cleanup runs synchronously, before the next event callback or
- * before the triggering API call returns. During destruction,
- * pending events are cleaned up in ascending event-ID order.
- *
- * A cleanup callback must not call any public API function on its
- * owning simulator, including read-only functions such as sim_now().
- * It must not attempt to destroy the owning simulator.
- *
- * Violating this restriction results in undefined behavior.
+ * before the triggering API call returns.
  */
 typedef void (*sim_user_context_destroy_fn)(void *user_context);
 
