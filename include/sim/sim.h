@@ -91,6 +91,7 @@ sim_status_t sim_create(sim_t **out);
  *
  * Returns SIM_ERR_REENTRANT without destroying the simulator if a run
  * is active. On success, sim becomes invalid and must not be reused.
+ * Executes all event cleanup-functions.
  */
 sim_status_t sim_destroy(sim_t *sim);
 

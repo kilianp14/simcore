@@ -1,14 +1,12 @@
 #include "event_queue.h"
 #include "sim/sim.h"
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #define EVENT_QUEUE_INITIAL_CAPACITY 64
-#define EVENT_QUEUE_MIN_CAPACITY 64
 
 struct event_queue {
     event_t *heap;
