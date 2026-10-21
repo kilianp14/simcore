@@ -539,47 +539,11 @@ static const test_case_t tests[] = {
 
     /* Re-allocation */
     TEST_CASE("event_queue_stress", test_event_queue_stress),
-
 };
 
 int main(int argc, char **argv) {
-    const size_t test_count = sizeof(tests) / sizeof(tests[0]);
-    size_t run_count = 0;
-    size_t passed_count = 0;
-    size_t i;
-
-    if (argc > 2) {
-        fprintf(stderr, "Usage: %s [test-name]\n", argv[0]);
-        return 2;
-    }
-
-    for (i = 0; i < test_count; ++i) {
-        const test_case_t *test = &tests[i];
-
-        if (argc == 2 && strcmp(argv[1], test->name) != 0) {
-            continue;
-        }
-
-        ++run_count;
-
-        if (test->run()) {
-            ++passed_count;
-            printf("PASS: %s\n", test->name);
-        } else {
-            fprintf(stderr, "FAIL: %s\n", test->name);
-        }
-    }
-
-    if (argc == 2 && run_count == 0) {
-        fprintf(stderr, "Unknown test: %s\nAvailable tests:\n", argv[1]);
-
-        for (i = 0; i < test_count; ++i) {
-            fprintf(stderr, "  %s\n", tests[i].name);
-        }
-
-        return 2;
-    }
-
-    printf("%zu/%zu tests passed\n", passed_count, run_count);
-    return passed_count == run_count ? 0 : 1;
+    test_suite_t suite = {
+        .name = "Unit: Event queue", .tests = tests, .count = sizeof(tests) / sizeof(tests[0])
+    };
+    return test_run(&suite, argc, argv);
 }

@@ -345,6 +345,11 @@ static const test_case_t tests[] = {
     TEST_CASE("sim_cancel_synchronous_exactly_once", test_sim_cancel_synchronous_exactly_once),
 };
 
-test_suite_t test_suite_schedule(void) {
-    return (test_suite_t){.tests = tests, .count = sizeof(tests) / sizeof(tests[0])};
+int main(int argc, char **argv) {
+    test_suite_t suite = {
+        .name = "Integration: Simulation schedule",
+        .tests = tests,
+        .count = sizeof(tests) / sizeof(tests[0])
+    };
+    return test_run(&suite, argc, argv);
 }

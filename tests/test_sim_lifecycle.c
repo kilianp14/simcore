@@ -174,6 +174,11 @@ static const test_case_t tests[] = {
     TEST_CASE("sim_status_string", test_sim_status_string),
 };
 
-test_suite_t test_suite_lifecycle(void) {
-    return (test_suite_t){.tests = tests, .count = sizeof(tests) / sizeof(tests[0])};
+int main(int argc, char **argv) {
+    test_suite_t suite = {
+        .name = "Integration: Simulation lifecycle",
+        .tests = tests,
+        .count = sizeof(tests) / sizeof(tests[0])
+    };
+    return test_run(&suite, argc, argv);
 }

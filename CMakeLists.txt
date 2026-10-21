@@ -22,38 +22,39 @@ target_compile_options(simcore PRIVATE ${SIM_COMPILE_OPTIONS})
 include(CTest)
 
 if(BUILD_TESTING)
-  # Public API / integration tests
-  file(GLOB SIM_TEST_SOURCES CONFIGURE_DEPENDS
-        "${PROJECT_SOURCE_DIR}/tests/test_sim_*.c"
-    )
+  # --- Integration Tests ---
 
-  add_executable(sim_tests ${SIM_TEST_SOURCES})
+  # Simulation lifecycle
+  add_executable(intg_test_sim_lifecycle tests/test_sim_lifecycle.c)
+  target_link_libraries(intg_test_sim_lifecycle PRIVATE simcore)
+  target_compile_options(intg_test_sim_lifecycle PRIVATE ${SIM_COMPILE_OPTIONS})
+  add_test(NAME intg_test_sim_lifecycle COMMAND intg_test_sim_lifecycle)
 
-  target_link_libraries(sim_tests PRIVATE simcore)
+  # Simulation schedule
+  add_executable(intg_test_sim_schedule tests/test_sim_schedule.c)
+  target_link_libraries(intg_test_sim_schedule PRIVATE simcore)
+  target_compile_options(intg_test_sim_schedule PRIVATE ${SIM_COMPILE_OPTIONS})
+  add_test(NAME intg_test_sim_schedule COMMAND intg_test_sim_schedule)
 
-  target_compile_options(sim_tests PRIVATE ${SIM_COMPILE_OPTIONS})
+  # Simulation run
+  add_executable(intg_test_sim_run tests/test_sim_run.c)
+  target_link_libraries(intg_test_sim_run PRIVATE simcore)
+  target_compile_options(intg_test_sim_run PRIVATE ${SIM_COMPILE_OPTIONS})
+  add_test(NAME intg_test_sim_run COMMAND intg_test_sim_run)
 
-  add_test(NAME sim_tests COMMAND sim_tests)
+  # --- Unit Tests ---
 
-
-  # Event queue unit tests
-  file(GLOB EVENT_QUEUE_TEST_SOURCES CONFIGURE_DEPENDS
-        "${PROJECT_SOURCE_DIR}/tests/unit/test_event_queue.c"
-    )
-
-  add_executable(event_queue_tests
-        ${EVENT_QUEUE_TEST_SOURCES}
+  # Event queue
+  add_executable(unit_test_event_queue
+        tests/unit/test_event_queue.c
         src/event_queue.c
     )
-
-  target_include_directories(event_queue_tests
+  target_include_directories(unit_test_event_queue
         PRIVATE
             ${PROJECT_SOURCE_DIR}/include
             ${PROJECT_SOURCE_DIR}/src/internal
             ${PROJECT_SOURCE_DIR}/tests
     )
-
-  target_compile_options(event_queue_tests PRIVATE ${SIM_COMPILE_OPTIONS})
-
-  add_test(NAME event_queue_tests COMMAND event_queue_tests)
+  target_compile_options(unit_test_event_queue PRIVATE ${SIM_COMPILE_OPTIONS})
+  add_test(NAME unit_test_event_queue COMMAND unit_test_event_queue)
 endif()

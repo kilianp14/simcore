@@ -133,7 +133,7 @@ bool event_queue_insert(event_queue_t *queue, const event_t *event) {
 
     queue->heap[queue->size] = *event;
     sift_up(queue, queue->size);
-    queue->size++;
+    ++queue->size;
 
     return true;
 }
@@ -171,7 +171,7 @@ bool event_queue_remove(event_queue_t *queue, sim_event_id_t id, event_t *out) {
 
     /* Find the event. */
     while (index < queue->size && queue->heap[index].id != id) {
-        index++;
+        ++index;
     }
     if (index == queue->size) {
         return false;
@@ -180,7 +180,7 @@ bool event_queue_remove(event_queue_t *queue, sim_event_id_t id, event_t *out) {
     event_t result = queue->heap[index];
 
     /* Fill the hole with the last event. */
-    queue->size--;
+    --queue->size;
     if (index < queue->size) {
         queue->heap[index] = queue->heap[queue->size];
 

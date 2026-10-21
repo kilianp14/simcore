@@ -44,7 +44,7 @@ sim_status_t sim_destroy(sim_t *sim) {
         event_t to_clean;
         event_queue_pop(sim->queue, &to_clean);
         if (to_clean.user_context_destroy) {
-            to_clean.user_context_destroy(&to_clean.user_context);
+            to_clean.user_context_destroy(to_clean.user_context);
         }
     }
     event_queue_destroy(sim->queue);
@@ -68,7 +68,12 @@ sim_status_t sim_schedule_at(
     sim_user_context_destroy_fn user_context_destroy,
     sim_event_id_t *out_id
 ) {
-    if (!sim || !callback || !out_id) {
+    if (!out_id) {
+        return SIM_ERR_INVALID_ARGUMENT;
+    }
+    *out_id = 0;
+
+    if (!sim || !callback) {
         return SIM_ERR_INVALID_ARGUMENT;
     }
     if (time < sim->now) {
@@ -85,11 +90,10 @@ sim_status_t sim_schedule_at(
         .user_context_destroy = user_context_destroy
     };
     if (!event_queue_insert(sim->queue, &new_event)) {
-        *out_id = 0;
         return SIM_ERR_OUT_OF_MEMORY;
     }
 
-    sim->last_event_id++;
+    ++sim->last_event_id;
     *out_id = sim->last_event_id;
 
     return SIM_OK;
@@ -103,7 +107,12 @@ sim_status_t sim_schedule_after(
     sim_user_context_destroy_fn user_context_destroy,
     sim_event_id_t *out_id
 ) {
-    if (!sim || !callback || !out_id) {
+    if (!out_id) {
+        return SIM_ERR_INVALID_ARGUMENT;
+    }
+    *out_id = 0;
+
+    if (!sim || !callback) {
         return SIM_ERR_INVALID_ARGUMENT;
     }
     if (delay > UINT64_MAX - sim->now) {
@@ -120,11 +129,10 @@ sim_status_t sim_schedule_after(
         .user_context_destroy = user_context_destroy
     };
     if (!event_queue_insert(sim->queue, &new_event)) {
-        *out_id = 0;
         return SIM_ERR_OUT_OF_MEMORY;
     }
 
-    sim->last_event_id++;
+    ++sim->last_event_id;
     *out_id = sim->last_event_id;
 
     return SIM_OK;
@@ -139,7 +147,7 @@ sim_status_t sim_cancel(sim_t *sim, sim_event_id_t event_id) {
         return SIM_ERR_NOT_FOUND;
     }
     if (to_clean.user_context_destroy) {
-        to_clean.user_context_destroy(&to_clean.user_context);
+        to_clean.user_context_destroy(to_clean.user_context);
     }
     return SIM_OK;
 }
@@ -157,9 +165,9 @@ sim_status_t sim_run(sim_t *sim) {
         event_queue_pop(sim->queue, &to_execute);
         sim->now = to_execute.time;
         sim_status_t status =
-            to_execute.callback(sim, to_execute.id, sim->now, &to_execute.user_context);
+            to_execute.callback(sim, to_execute.id, sim->now, to_execute.user_context);
         if (to_execute.user_context_destroy) {
-            to_execute.user_context_destroy(&to_execute.user_context);
+            to_execute.user_context_destroy(to_execute.user_context);
         }
         if (status != SIM_OK) {
             sim->running = false;
@@ -174,25 +182,25 @@ sim_status_t sim_run_until(sim_t *sim, sim_time_t until) {
     if (!sim) {
         return SIM_ERR_INVALID_ARGUMENT;
     }
+    if (until < sim->now) {
+        return SIM_ERR_TIME_IN_PAST;
+    }
     if (sim->running) {
         return SIM_ERR_REENTRANT;
     }
     sim->running = true;
     while (true) {
         event_t to_execute;
-        if (!event_queue_peek(sim->queue, &to_execute)) {
+        if (!event_queue_peek(sim->queue, &to_execute) || to_execute.time > until) {
             sim->now = until;
-            break;
-        }
-        if (to_execute.time > until) {
             break;
         }
         event_queue_pop(sim->queue, &to_execute);
         sim->now = to_execute.time;
         sim_status_t status =
-            to_execute.callback(sim, to_execute.id, sim->now, &to_execute.user_context);
+            to_execute.callback(sim, to_execute.id, sim->now, to_execute.user_context);
         if (to_execute.user_context_destroy) {
-            to_execute.user_context_destroy(&to_execute.user_context);
+            to_execute.user_context_destroy(to_execute.user_context);
         }
         if (status != SIM_OK) {
             sim->running = false;
