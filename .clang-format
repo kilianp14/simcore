@@ -1,5 +1,4 @@
 BasedOnStyle: LLVM
-Language: C
 
 IndentWidth: 4
 ContinuationIndentWidth: 4
@@ -12,3 +11,12 @@ BinPackParameters: false
 AlignAfterOpenBracket: BlockIndent
 
 SortIncludes: CaseSensitive
+
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+
+# Prefer keeping a function's return type and name together.
+PenaltyReturnTypeOnItsOwnLine: 1000

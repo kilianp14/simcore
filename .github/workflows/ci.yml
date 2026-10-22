@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and test (${{ matrix.preset }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - clang-debug
+          - clang-release
+          - clang-sanitize
+          - gcc-debug
+          - gcc-release
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configure
+        run: cmake --preset "${{ matrix.preset }}" -DENABLE_WERROR=ON
+
+      - name: Build
+        run: cmake --build --preset "${{ matrix.preset }}" --parallel 2
+
+      - name: Test
+        run: ctest --preset "${{ matrix.preset }}"
+
+  static-analysis:
+    name: Static analysis (clang-tidy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install
+        run: |
+          sudo apt update
+          sudo apt install --yes clang-tidy
+
+      - name: Configure
+        run: cmake --preset clang-tidy
+
+      - name: Analyze
+        run: cmake --build --preset clang-tidy --parallel 2
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install
+        run: |
+          sudo apt update
+          sudo apt install --yes clang-format
+
+      - name: Check formatting
+        run: |
+          git ls-files -z -- \
+            ':(glob)src/**/*.c' \
+            ':(glob)src/**/*.h' \
+            ':(glob)tests/**/*.c' \
+            ':(glob)tests/**/*.h' |
+            xargs -0 -r clang-format --dry-run --Werror

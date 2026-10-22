@@ -6,7 +6,30 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-set(SIM_COMPILE_OPTIONS -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
+set(SIM_COMPILE_OPTIONS
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wconversion
+    -Wshadow
+    -Wstrict-prototypes
+    -Wmissing-prototypes
+)
+
+option(ENABLE_WERROR "Treat compiler warnings as errors" OFF)
+if(ENABLE_WERROR)
+  add_compile_options(-Werror)
+endif()
+
+option(
+  ENABLE_SANITIZERS
+  "Enable AddressSanitizer and UndefinedBehaviorSanitizer"
+  OFF
+)
+if(ENABLE_SANITIZERS)
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
 
 add_library(simcore src/sim.c src/event_queue.c)
 
@@ -46,15 +69,15 @@ if(BUILD_TESTING)
 
   # Event queue
   add_executable(unit_test_event_queue
-        tests/unit/test_event_queue.c
-        src/event_queue.c
-    )
+      tests/unit/test_event_queue.c
+      src/event_queue.c
+  )
   target_include_directories(unit_test_event_queue
-        PRIVATE
-            ${PROJECT_SOURCE_DIR}/include
-            ${PROJECT_SOURCE_DIR}/src/internal
-            ${PROJECT_SOURCE_DIR}/tests
-    )
+      PRIVATE
+          ${PROJECT_SOURCE_DIR}/include
+          ${PROJECT_SOURCE_DIR}/src/internal
+          ${PROJECT_SOURCE_DIR}/tests
+  )
   target_compile_options(unit_test_event_queue PRIVATE ${SIM_COMPILE_OPTIONS})
   add_test(NAME unit_test_event_queue COMMAND unit_test_event_queue)
 endif()

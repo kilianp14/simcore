@@ -8,11 +8,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#define NUM2STR(x) STR(x)
+#define STR(x) #x
+
 #define TEST_CASE(name, fn) {name, fn}
 #define CHECK(condition)                                                                           \
     do {                                                                                           \
         if (!(condition)) {                                                                        \
-            fprintf(stderr, "%s:%d: check failed: %s\n", __FILE__, __LINE__, #condition);          \
+            fputs(__FILE__ ":" NUM2STR(__LINE__) " in ", stderr);                                  \
+            fputs(__func__, stderr);                                                               \
+            fputs(": check failed: " #condition "\n", stderr);                                     \
             return false;                                                                          \
         }                                                                                          \
     } while (0)
@@ -83,8 +88,9 @@ typedef struct {
     size_t cleanup_count;
 } logging_context_t;
 
-static inline sim_status_t
-logging_callback(sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context) {
+static inline sim_status_t logging_callback(
+    sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context
+) {
     logging_context_t *log = user_context;
     (void)sim;
 

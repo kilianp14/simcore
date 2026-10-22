@@ -14,8 +14,9 @@ typedef struct {
     sim_event_id_t scheduled_id;
 } schedule_now_context_t;
 
-static sim_status_t
-schedule_now_callback(sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context) {
+static sim_status_t schedule_now_callback(
+    sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context
+) {
     schedule_now_context_t *context = user_context;
     logging_context_t *logging_context = context->logging_context;
 
@@ -30,8 +31,9 @@ schedule_now_callback(sim_t *sim, sim_event_id_t event_id, sim_time_t now, void 
 }
 
 /* Failing callback. Includes logging. */
-static sim_status_t
-failing_callback(sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context) {
+static sim_status_t failing_callback(
+    sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context
+) {
     logging_context_t *logging_context = user_context;
     (void)sim;
 
@@ -50,8 +52,9 @@ typedef struct {
     sim_status_t nested_destroy_status;
 } recursive_run_context_t;
 
-static sim_status_t
-recursive_run_callback(sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context) {
+static sim_status_t recursive_run_callback(
+    sim_t *sim, sim_event_id_t event_id, sim_time_t now, void *user_context
+) {
     recursive_run_context_t *context = user_context;
     logging_context_t *logging_context = context->logging_context;
 

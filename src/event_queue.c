@@ -28,9 +28,15 @@ static bool event_precedes(const event_t *a, const event_t *b) {
 }
 
 /* Heap indexing helpers. */
-static size_t parent(size_t i) { return (i - 1) / 2; }
-static size_t left_child(size_t i) { return (2 * i + 1); }
-static size_t right_child(size_t i) { return (2 * i + 2); }
+static size_t parent(size_t i) {
+    return (i - 1) / 2;
+}
+static size_t left_child(size_t i) {
+    return (2 * i + 1);
+}
+static size_t right_child(size_t i) {
+    return (2 * i + 2);
+}
 
 /* Restore heap helpers. */
 static void sift_down(event_queue_t *queue, size_t index) {
@@ -196,6 +202,10 @@ bool event_queue_remove(event_queue_t *queue, sim_event_id_t id, event_t *out) {
     return true;
 }
 
-bool event_queue_is_empty(const event_queue_t *queue) { return queue->size == 0; }
+bool event_queue_is_empty(const event_queue_t *queue) {
+    return queue->size == 0;
+}
 
-size_t event_queue_size(const event_queue_t *queue) { return queue->size; }
+size_t event_queue_size(const event_queue_t *queue) {
+    return queue->size;
+}

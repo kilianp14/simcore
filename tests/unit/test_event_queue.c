@@ -36,8 +36,9 @@ static bool check_event_equal(const event_t *actual, const event_t *expected) {
 }
 
 /* Verifies that events are popped in the expected ID order and that queue is empty afterward. */
-static bool
-check_pop_order(event_queue_t *queue, const sim_event_id_t *expected_ids, size_t expected_count) {
+static bool check_pop_order(
+    event_queue_t *queue, const sim_event_id_t *expected_ids, size_t expected_count
+) {
     CHECK(event_queue_size(queue) == expected_count);
 
     for (size_t i = 0; i < expected_count; ++i) {
