@@ -54,7 +54,7 @@ jobs:
         run: cmake --build --preset clang-tidy --parallel 2
 
   format:
-    name: Format
+    name: Formatting (clang-format)
     runs-on: ubuntu-latest
 
     steps:

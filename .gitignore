@@ -1,10 +1,11 @@
-# Build
+# C/CMake Build
 /build/
 /build-*/
 /CMakeUserPresets.json
+/compile_commands.json
 
 # Local caches
 /.cache/
 
-# Local compilation database
-/compile_commands.json
+# Python
+.venv
