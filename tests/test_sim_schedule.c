@@ -259,6 +259,10 @@ static bool test_sim_cancel_remove_pending_event(void) {
     );
 
     CHECK(sim_cancel(sim, cancelled_id) == SIM_OK);
+
+    /* Event is not found after cancellation. */
+    CHECK(sim_cancel(sim, cancelled_id) == SIM_ERR_NOT_FOUND);
+
     CHECK(sim_run(sim) == SIM_OK);
     CHECK(logging_context.callback_count == 1);
 

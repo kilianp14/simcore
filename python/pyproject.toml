@@ -1,20 +1,20 @@
 [project]
 name = "simcore"
 version = "0.1.0"
-description = "Add your description here"
+description = "Public Python API for simcore, a deterministic, discrete-event simulator."
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-    "cffi>=2.1.1",
-]
+dependencies = ["cffi>=2.1.1"]
 
 [build-system]
 requires = ["uv_build>=0.13.5,<0.14.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "mypy>=2.4.0",
-    "pytest>=9.1.1",
-    "ruff>=0.17.2",
-]
+dev = ["mypy>=2.4.0", "pytest>=9.1.1", "ruff>=0.17.2"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

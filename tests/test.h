@@ -96,14 +96,14 @@ static inline sim_status_t logging_callback(
 
     log->ids[log->callback_count] = event_id;
     log->times[log->callback_count] = now;
-    log->callback_count++;
+    ++log->callback_count;
 
     return SIM_OK;
 }
 
 static inline void logging_cleanup_callback(void *user_context) {
     logging_context_t *log = user_context;
-    log->cleanup_count++;
+    ++log->cleanup_count;
 }
 
 #endif
