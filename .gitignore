@@ -5,10 +5,12 @@
 /compile_commands.json
 
 # Local caches
-/.cache/
+*.cache/
 
 # Python
-__pycache__
-.mypy_cache
-.ruff_cache
-.venv
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+*.egg-info/

@@ -73,7 +73,7 @@ def test_simulator_context_manager(callback, calls):
 
 
 @pytest.mark.parametrize(
-    ("method", "args", "exception"),
+    ("method", "args"),
     [
         ("schedule_at", ("1", lambda *_: None)),
         ("schedule_at", (0, None)),
@@ -83,7 +83,7 @@ def test_simulator_context_manager(callback, calls):
         ("run_until", ("1",)),
     ],
 )
-def test_argument_type_validation(method, args, exception):
+def test_argument_type_validation(method, args):
     with Simulator() as sim:
         with pytest.raises(TypeError):
             getattr(sim, method)(*args)
