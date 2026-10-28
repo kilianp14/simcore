@@ -1,5 +1,6 @@
 import gc
 import weakref
+
 import pytest
 
 from simcore import Simulator
@@ -84,9 +85,8 @@ def test_simulator_context_manager(callback, calls):
     ],
 )
 def test_argument_type_validation(method, args):
-    with Simulator() as sim:
-        with pytest.raises(TypeError):
-            getattr(sim, method)(*args)
+    with Simulator() as sim, pytest.raises(TypeError):
+        getattr(sim, method)(*args)
 
 
 @pytest.mark.parametrize(
@@ -134,9 +134,8 @@ def test_argument_overflow_validation(method, args, advance_to_max):
 
 
 def test_cancel_unknown_event_raises_key_error():
-    with Simulator() as sim:
-        with pytest.raises(KeyError):
-            sim.cancel(1)
+    with Simulator() as sim, pytest.raises(KeyError):
+        sim.cancel(1)
 
 
 @pytest.mark.parametrize(
@@ -187,9 +186,8 @@ def test_operations_during_active_run_raise_runtime_error(method, args):
 def test_context_manager_does_not_suppress_exception():
     failure = ValueError("body failed")
 
-    with pytest.raises(ValueError) as exc_info:
-        with Simulator():
-            raise failure
+    with pytest.raises(ValueError) as exc_info, Simulator():
+        raise failure
 
     assert exc_info.value is failure
 

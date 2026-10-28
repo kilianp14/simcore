@@ -3,9 +3,10 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Literal, Self, Any
+from typing import Any, Literal, Self
 
-from ._simcorecffi import lib as _lib, ffi as _ffi
+from ._simcorecffi import ffi as _ffi  # type: ignore[import-not-found]
+from ._simcorecffi import lib as _lib  # type: ignore[import-not-found]
 
 type EventCallback = Callable[["Simulator", int, int], None]
 
@@ -246,6 +247,8 @@ class Simulator:
         if status == _lib.SIM_ERR_REENTRANT:
             raise RuntimeError("Simulator is already running.")
         if status == _lib.SIM_ERR_CALLBACK:
+            if self._callback_exception is None:
+                raise AssertionError("Callback failed without recording an exception.")
             raise self._callback_exception
 
         # Sanity check
@@ -292,6 +295,8 @@ class Simulator:
         if status == _lib.SIM_ERR_TIME_IN_PAST:
             raise ValueError("until is earlier than the current simulation time.")
         if status == _lib.SIM_ERR_CALLBACK:
+            if self._callback_exception is None:
+                raise AssertionError("Callback failed without recording an exception.")
             raise self._callback_exception
 
         # Sanity check
@@ -398,7 +403,9 @@ def _sim_python_event_callback(_sim, event_id, event_time, context):
             int(event_id),
             int(event_time),
         )
-    except BaseException as exc:
+    # Exceptions must not unwind through the C callback boundary.
+    # Preserve the original exception and re-raise it from run()/run_until().
+    except BaseException as exc:  # noqa: BLE001
         record.simulator._set_callback_exception(exc)
         return _lib.SIM_ERR_CALLBACK
 
