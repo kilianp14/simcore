@@ -1,10 +1,19 @@
-# Build
+# C/CMake Build
 /build/
 /build-*/
 /CMakeUserPresets.json
+/compile_commands.json
 
 # Local caches
-/.cache/
+*.cache/
 
-# Local compilation database
-/compile_commands.json
+# Python
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+*.egg-info/
+
+# CFFI compiled extension
+*_simcorecffi*
