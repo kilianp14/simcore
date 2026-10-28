@@ -75,7 +75,7 @@ jobs:
             xargs -0 -r clang-format --dry-run --Werror
 
   python-bindings:
-    name: Python bindings (${{ matrix.preset }})
+    name: Python bindings (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -96,7 +96,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Dependencies
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --locked --dev
 
       - name: Formatting
         run: uv run ruff format --check
