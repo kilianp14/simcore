@@ -37,7 +37,7 @@ def exercise_api(sim, callback, calls):
 
     sim.cancel(cancelled)
 
-    sim.run_until(3)
+    sim.run(until=3)
 
     assert sim.now == 3
     assert calls == [(sim, second, 3)]
@@ -81,7 +81,7 @@ def test_simulator_context_manager(callback, calls):
         ("schedule_after", ("1", lambda *_: None)),
         ("schedule_after", (0, None)),
         ("cancel", ("1",)),
-        ("run_until", ("1",)),
+        ("run", ("1",)),
     ],
 )
 def test_argument_type_validation(method, args):
@@ -101,14 +101,14 @@ def test_argument_type_validation(method, args):
         ("cancel", (0,), False),
         ("cancel", (-1,), False),
         # Negative time and run_until in the past.
-        ("run_until", (-1,), False),
-        ("run_until", (0,), True),
+        ("run", (-1,), False),
+        ("run", (0,), True),
     ],
 )
 def test_argument_value_validation(method, args, advance_first):
     with Simulator() as sim:
         if advance_first:
-            sim.run_until(1)
+            sim.run(until=1)
 
         with pytest.raises(ValueError):
             getattr(sim, method)(*args)
@@ -121,13 +121,13 @@ def test_argument_value_validation(method, args, advance_first):
         ("schedule_after", (MAX_U64 + 1, lambda *_: None), False),
         ("schedule_after", (1, lambda *_: None), True),
         ("cancel", (MAX_U64 + 1,), False),
-        ("run_until", (MAX_U64 + 1,), False),
+        ("run", (MAX_U64 + 1,), False),
     ],
 )
 def test_argument_overflow_validation(method, args, advance_to_max):
     with Simulator() as sim:
         if advance_to_max:
-            sim.run_until(MAX_U64)
+            sim.run(until=MAX_U64)
 
         with pytest.raises(OverflowError):
             getattr(sim, method)(*args)
@@ -146,7 +146,6 @@ def test_cancel_unknown_event_raises_key_error():
         ("schedule_after", (0, lambda *_: None)),
         ("cancel", (1,)),
         ("run", ()),
-        ("run_until", (0,)),
         ("__enter__", ()),
     ],
 )
@@ -162,7 +161,6 @@ def test_operations_on_closed_simulator_raise_runtime_error(method, args):
     ("method", "args"),
     [
         ("run", ()),
-        ("run_until", (0,)),
         ("close", ()),
         ("__exit__", (None, None, None)),
     ],

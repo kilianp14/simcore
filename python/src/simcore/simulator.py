@@ -14,9 +14,9 @@ type EventCallback = Callable[["Simulator", int, int], None]
 class Simulator:
     """A deterministic, discrete-event simulator.
 
-    The simulator owns a native C instance. Callbacks execute synchronously during run()
-    or run_until(). The instance must be closed when no longer needed; context management
-    provides automatic cleanup.
+    The simulator owns a native C instance. Callbacks execute synchronously during run().
+    The instance must be closed when no longer needed; context management provides
+    automatic cleanup.
     A Simulator instance must not be accessed concurrently from multiple threads.
     """
 
@@ -224,68 +224,44 @@ class Simulator:
         message = _ffi.string(_lib.sim_status_string(status)).decode("utf-8", errors="replace")
         raise AssertionError(f"Unexpected sim_cancel() status: {message}")
 
-    def run(self) -> None:
-        """Process events until the event queue is empty.
+    def run(self, until: int | None = None) -> None:
+        """Process events until the queue is empty or the time limit is reached.
 
-        Events scheduled by callbacks are processed during the same run.
-
-        Raises:
-            RuntimeError: If the simulator is closed or a run is already active.
-            BaseException: If a callback raises, its original exception is re-raised
-                after control returns from the native library.
-        """
-        if self._closed:
-            raise RuntimeError("Simulator closed.")
-
-        self._callback_exception = None
-
-        status = _lib.sim_run(self._sim)
-
-        if status == _lib.SIM_OK:
-            return
-
-        if status == _lib.SIM_ERR_REENTRANT:
-            raise RuntimeError("Simulator is already running.")
-        if status == _lib.SIM_ERR_CALLBACK:
-            if self._callback_exception is None:
-                raise AssertionError("Callback failed without recording an exception.")
-            raise self._callback_exception
-
-        # Sanity check
-        message = _ffi.string(_lib.sim_status_string(status)).decode("utf-8", errors="replace")
-        raise AssertionError(f"Unexpected sim_run() status: {message}")
-
-    def run_until(self, until: int) -> None:
-        """Process all events scheduled at or before ``until``.
-
-        On success, advance the simulation time to ``until``, even if no event occurs
-        there. Events scheduled by callbacks are processed if their times are within
-        the limit.
+        If ``until`` is None, process events until the event queue is empty.
+        Otherwise, process all events scheduled at or before ``until`` and
+        advance the simulation time to ``until``, even if no event occurs
+        there. Events scheduled by callbacks are processed during the same
+        run if their times satisfy the stopping condition.
 
         Args:
-            until: Inclusive simulation-time limit.
+            until: Optional inclusive simulation-time limit. If None, run
+                until the event queue is empty.
 
         Raises:
-            TypeError: If ``until`` is not an integer.
-            ValueError: If ``until`` is negative or earlier than the current time.
-            OverflowError: If ``until`` exceeds uint64.
+            TypeError: If ``until`` specified and not an integer.
+            ValueError: If specified ``until`` is negative or earlier than the current
+                simulation time.
+            OverflowError: If specified ``until`` exceeds uint64.
             RuntimeError: If the simulator is closed or a run is already active.
-            BaseException: If a callback raises, its original exception is re-raised
-                after control returns from the native library.
+            BaseException: If a callback raises, its original exception is
+                re-raised after control returns from the native library.
         """
         if self._closed:
             raise RuntimeError("Simulator closed.")
 
         self._callback_exception = None
 
-        if not isinstance(until, int):
-            raise TypeError("until must be an integer.")
-        if until < 0:
-            raise ValueError("until must be non-negative.")
-        if until > 2**64 - 1:
-            raise OverflowError("until exceeds uint64.")
+        if until is None:
+            status = _lib.sim_run(self._sim)
+        else:
+            if not isinstance(until, int):
+                raise TypeError("until must be an integer.")
+            if until < 0:
+                raise ValueError("until must be non-negative.")
+            if until > 2**64 - 1:
+                raise OverflowError("until exceeds uint64.")
 
-        status = _lib.sim_run_until(self._sim, until)
+            status = _lib.sim_run_until(self._sim, until)
 
         if status == _lib.SIM_OK:
             return
@@ -301,7 +277,7 @@ class Simulator:
 
         # Sanity check
         message = _ffi.string(_lib.sim_status_string(status)).decode("utf-8", errors="replace")
-        raise AssertionError(f"Unexpected sim_run_until() status: {message}")
+        raise AssertionError(f"Unexpected sim_run()/sim_run_until() status: {message}")
 
     def close(self) -> None:
         """Destroy the simulator and release its resources.
@@ -404,7 +380,7 @@ def _sim_python_event_callback(_sim, event_id, event_time, context):
             int(event_time),
         )
     # Exceptions must not unwind through the C callback boundary.
-    # Preserve the original exception and re-raise it from run()/run_until().
+    # Preserve the original exception and re-raise it from run().
     except BaseException as exc:  # noqa: BLE001
         record.simulator._set_callback_exception(exc)
         return _lib.SIM_ERR_CALLBACK
